@@ -3,13 +3,40 @@ import sys
 from datetime import datetime
 
 import pandas as pd
-
 from tqdm import tqdm
 
 from utils.logger import set_up_logger
-from utils.parser import get_districts, get_cadastral_areas, get_surnames, get_owner_list
+from utils.parser import get_cadastral_areas, get_districts, get_owner_list, get_surnames
 
-LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "CH", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+LETTERS = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "CH",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+]
 
 logger = logging.getLogger(__name__)
 

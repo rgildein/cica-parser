@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 def tries(f: Optional[Callable] = None, try_count: int = 3):
     """tries run more times"""
+
     def real_decorator(func):
         @wraps(func)
         def decorator(*args, count: int = 0, **kwargs):
@@ -15,7 +16,7 @@ def tries(f: Optional[Callable] = None, try_count: int = 3):
             except Exception as error:
                 logger.error(error)
                 if count + 1 < try_count:
-                    return decorator(*args, count=count+1, **kwargs)
+                    return decorator(*args, count=count + 1, **kwargs)
                 else:
                     raise error
 

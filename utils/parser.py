@@ -1,8 +1,8 @@
 import logging
+import time
 from contextlib import contextmanager
 from typing import List, Optional
 
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
@@ -18,13 +18,13 @@ logger = logging.getLogger(__name__)
 
 @contextmanager
 def cica(
-        district: Optional[str] = None,
-        cadastral_area: Optional[str] = None,
-        first_letter: Optional[str] = None,
-        surname: Optional[str] = None,
+    district: Optional[str] = None,
+    cadastral_area: Optional[str] = None,
+    first_letter: Optional[str] = None,
+    surname: Optional[str] = None,
 ):
     options = Options()
-    options.add_argument('--headless')
+    options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
     try:
         driver.get("https://cica.vugk.sk/Default.aspx")
