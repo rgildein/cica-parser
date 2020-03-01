@@ -57,12 +57,12 @@ def get_data():
     return data
 
 
-def main(debug: bool = False):
-    set_up_logger(debug)
+def main(debug: bool, console: bool):
+    set_up_logger(debug, console),
     data = get_data()
     df = pd.DataFrame(data=data, columns=["okres", "katastralne uzemie", "prve pismeno", "priezvisko", "vlastnik"])
     df.to_csv(f"cica-{datetime.now():%Y%m%d-%H%M}'.csv", sep=";")
 
 
 if __name__ == "__main__":
-    main(any([argv == "--debug" for argv in sys.argv]))
+    main(any([argv == "--debug" for argv in sys.argv]), any([argv == "--console" for argv in sys.argv]))
