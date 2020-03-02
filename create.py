@@ -31,16 +31,22 @@ def get_data(args: Tuple[int, int, bool, bool]):
     set_up_logger(debug, console, f"{output}.log")
 
     with cica() as driver:
-        for district in tqdm(get_districts(driver, max_try=5)[part::n], desc="district"):
-            for cadastral_area in tqdm(get_cadastral_areas(driver, district, max_try=5), desc="cad. area", leave=False):
+        for district in tqdm(get_districts(driver, max_try=5)[part::n], desc="district", position=part * 4):
+            for cadastral_area in tqdm(
+                get_cadastral_areas(driver, district, max_try=5), desc="cad. area", leave=False, position=part * 4 + 1
+            ):
                 for letter in tqdm(
-                    get_letters(driver, district, cadastral_area, max_try=5), desc="letter", leave=False
+                    get_letters(driver, district, cadastral_area, max_try=5),
+                    desc="letter",
+                    leave=False,
+                    position=part * 4 + 2,
                 ):
                     if letter:
                         for surname in tqdm(
                             get_surnames(driver, district, cadastral_area, letter, max_try=5),
                             desc="surname",
                             leave=False,
+                            position=part * 4 + 3,
                         ):
                             get_owners(f"{output}.csv", driver, district, cadastral_area, letter, surname)
 
