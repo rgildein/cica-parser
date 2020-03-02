@@ -5,13 +5,8 @@ from typing import Any, Callable, Dict, List, Optional
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
-from utils.selenium import (
-    get_select_options,
-    get_selected_value,
-    select_value,
-    wait_until_empty_select,
-    wait_until_value_change,
-)
+from utils.selenium import get_select_options, get_selected_value, select_value, get_select_element_id, \
+    wait_until_new_select
 
 STEPS_ORDER = ["district", "cadastral_area", "letter", "surname"]
 TIMEOUT = 5
@@ -51,26 +46,27 @@ def cica_steps(
         cica_initialized(driver)
 
     if district and district != get_selected_value(driver, "DropDownList_okres"):
-        original_cadastral_area = get_selected_value(driver, "DropDownList_ku")
+        original_cadastral_area_id = get_select_element_id(driver, "DropDownList_ku")
         select_value(driver, "DropDownList_okres", district)
-        wait_until_value_change(driver, "DropDownList_ku", original_cadastral_area)
+        wait_until_new_select(driver, "DropDownList_ku", original_cadastral_area_id)
         logger.info(f"district `{district}` was successfully changed")
 
     if cadastral_area and cadastral_area != get_selected_value(driver, "DropDownList_ku"):
-        original_commune = get_selected_value(driver, "DropDownList_obec")
+        original_commune_id = get_select_element_id(driver, "DropDownList_obec")
         select_value(driver, "DropDownList_ku", cadastral_area)
-        wait_until_value_change(driver, "DropDownList_obec", original_commune)
+        wait_until_new_select(driver, "DropDownList_obec", original_commune_id)
         logger.info(f"cadastral_area `{cadastral_area}` was successfully changed")
 
     if letter and letter != get_selected_value(driver, "DropDownList_ABC"):
+        original_surname_id = get_select_element_id(driver, "DropDownList_VL_PRI")
         select_value(driver, "DropDownList_ABC", letter)
-        wait_until_empty_select(driver, "DropDownList_VL_PRI")
+        wait_until_new_select(driver, "DropDownList_VL_PRI", original_surname_id)
         logger.info(f"letter `{letter}` was successfully changed")
 
     if surname and surname != get_selected_value(driver, "DropDownList_VL_PRI"):
-        original_surname = get_selected_value(driver, "DropDownList_VL")
+        original_owner_id = get_select_element_id(driver, "DropDownList_VL")
         select_value(driver, "DropDownList_VL_PRI", surname)
-        wait_until_value_change(driver, "DropDownList_VL", original_surname)
+        wait_until_new_select(driver, "DropDownList_VL", original_owner_id)
         logger.info(f"surname `{surname}` was successfully changed")
 
 
