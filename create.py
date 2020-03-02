@@ -9,13 +9,13 @@ from tqdm import tqdm
 
 from utils.data import save_data
 from utils.logger import set_up_logger
-from utils.parser import get_cadastral_areas, get_districts, get_owner_list, get_surnames, cica, get_letters
+from utils.parser import cica, get_cadastral_areas, get_districts, get_letters, get_owner_list, get_surnames
 
 logger = logging.getLogger(__name__)
 
 
 def get_owners(
-        output_file: str, driver: webdriver, district: str, cadastral_area: str, letter: str, surname: str
+    output_file: str, driver: webdriver, district: str, cadastral_area: str, letter: str, surname: str
 ) -> None:
     """get list of owners and save it"""
     data = []
@@ -34,13 +34,13 @@ def get_data(args: Tuple[int, int, bool, bool]):
         for district in tqdm(get_districts(driver, max_try=5)[part::n], desc="district"):
             for cadastral_area in tqdm(get_cadastral_areas(driver, district, max_try=5), desc="cad. area", leave=False):
                 for letter in tqdm(
-                        get_letters(driver, district, cadastral_area, max_try=5), desc="letter", leave=False
+                    get_letters(driver, district, cadastral_area, max_try=5), desc="letter", leave=False
                 ):
                     if letter:
                         for surname in tqdm(
-                                get_surnames(driver, district, cadastral_area, letter, max_try=5),
-                                desc="surname",
-                                leave=False
+                            get_surnames(driver, district, cadastral_area, letter, max_try=5),
+                            desc="surname",
+                            leave=False,
                         ):
                             get_owners(f"{output}.csv", driver, district, cadastral_area, letter, surname)
 
