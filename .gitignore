@@ -1,3 +1,6 @@
+# jupyter-lab
+*.ipynb
+
 # data
 *.csv
 
