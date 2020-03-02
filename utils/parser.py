@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @contextmanager
 def cica():
     options = Options()
-    # options.add_argument("--headless")
+    options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
     try:
         cica_initialized(driver)
