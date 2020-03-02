@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from utils.data import save_data
 from utils.logger import set_up_logger
-from utils.parser import cica, get_cadastral_areas, get_districts, get_letters, get_owner_list, get_surnames
+from utils.parser import cica, get_cadastral_areas, get_districts, get_owner_list, get_surnames, get_letters
 
 logger = logging.getLogger(__name__)
 
@@ -31,24 +31,24 @@ def get_data(args: Tuple[int, int, bool, bool]):
     set_up_logger(debug, console, f"{output}.log")
 
     with cica() as driver:
-        for district in tqdm(get_districts(driver, max_try=5)[part::n], desc="district", position=part * 4):
-            for cadastral_area in tqdm(
-                get_cadastral_areas(driver, district, max_try=5), desc="cad. area", leave=False, position=part * 4 + 1
-            ):
-                for letter in tqdm(
-                    get_letters(driver, district, cadastral_area, max_try=5),
-                    desc="letter",
-                    leave=False,
-                    position=part * 4 + 2,
-                ):
-                    if letter:
-                        for surname in tqdm(
-                            get_surnames(driver, district, cadastral_area, letter, max_try=5),
-                            desc="surname",
-                            leave=False,
-                            position=part * 4 + 3,
-                        ):
-                            get_owners(f"{output}.csv", driver, district, cadastral_area, letter, surname)
+        pbar = tqdm(get_districts(driver, max_try=5)[::-1][part::n], desc=f"district #{part}", position=part)
+        for district in pbar:
+            logger.info(f"district: `{district}`")
+
+            cadastral_areas = get_cadastral_areas(driver, district, max_try=5)
+            for i0, cadastral_area in enumerate(cadastral_areas):
+                logger.info(f"cadastral area: `{cadastral_area}`")
+
+                letters = get_letters(driver, district, cadastral_area, max_try=5)
+                for i1, letter in enumerate(letters):
+                    logger.info(f"letter: `{letter}`")
+
+                    for surname in get_surnames(driver, district, cadastral_area, letter, max_try=5):
+                        logger.info(f"surname: `{surname}`")
+                        get_owners(f"{output}.csv", driver, district, cadastral_area, letter, surname)
+
+                    pbar.set_description(f"district #{part} {i0+1}/{len(cadastral_areas)} {i1+1}/{len(letters)}")
+                    pbar.refresh()
 
 
 def main(debug: bool, console: bool, number_of_thread: int):

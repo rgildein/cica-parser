@@ -1,66 +1,55 @@
 import logging
+from typing import List, NamedTuple
 
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote import webelement
-from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from utils.wrapper import tries
+from utils.expected_conditions import WaitUntilReadySelect, WaitUntilChangedSelect, WaitUntilEmptySelect, \
+    WaitUntilSelectOptions, WaitUntilValueSelect
 
-TIMEOUT = 5
+TIMEOUT = 20
+Option = NamedTuple("option", [("text", str), ("value", str)])
 logger = logging.getLogger(__name__)
 
 
-class WaitUntilNotEmptySelect(object):
-    def __init__(self, locator):
-        self.locator = locator
-
-    def __call__(self, driver):
-        try:
-            options = expected_conditions._find_elements(driver, self.locator)
-            if len(options) == 0:
-                return False
-            elif len(options) == 1 and not options[0].text:
-                return False
-            else:
-                return True
-        except StaleElementReferenceException:
-            return False
-
-
-@tries
-def wait_until_empty(driver: webdriver, select_id: str) -> None:
-    """wait until select is not empty"""
-
-    WebDriverWait(driver, TIMEOUT).until(
-        WaitUntilNotEmptySelect((By.XPATH, f"//select[@id='{select_id}']/option")),
-        f"element {select_id} was not found with not empty value",
+def get_select_options(driver: webdriver, select_id: str) -> List[Option]:
+    """get all select options"""
+    return WebDriverWait(driver, TIMEOUT).until(
+        WaitUntilSelectOptions((By.XPATH, f"//select[@id='{select_id}']")),
+        f"element `{select_id}` could not be found",
     )
-    logger.debug(f"element {select_id} was found with not empty value")
 
 
-@tries
-def wait_until_click(driver: webdriver, select_id: str, value: str) -> None:
-    """wait util select value"""
-    wait_until_empty(driver, select_id)
-    WebDriverWait(driver, TIMEOUT).until(
-        expected_conditions.element_to_be_clickable(
-            (By.XPATH, f"//select[@id='{select_id}']/option[@value='{value}']")
-        ),
-        f"value {value} at element {select_id} was not found",
-    ).click()
-    logger.debug(f"value {value} at element {select_id} was found")
+def get_selected_value(driver: webdriver, select_id: str) -> str:
+    """get actual selected value"""
+    value = WebDriverWait(driver, TIMEOUT).until(
+        WaitUntilValueSelect((By.XPATH, f"//select[@id='{select_id}']/option[@selected='selected']")),
+        f"element '{select_id}' has no selected value"
+    )
+    return value if value != "--empty--" else ""
 
 
-@tries
-def wait_until_find(driver: webdriver, select_id: str) -> webelement:
-    """wait until find select"""
-    wait_until_empty(driver, select_id)
+def select_value(driver: webdriver, select_id: str, value: str) -> None:
+    """select value"""
     element = WebDriverWait(driver, TIMEOUT).until(
-        expected_conditions.element_to_be_clickable((By.XPATH, f"//select[@id='{select_id}']")),
-        f"element {select_id} was not found",
+            WaitUntilReadySelect((By.XPATH, f"//select[@id='{select_id}']/option[@value='{value}']")),
+            f"value `{value}` at element `{select_id}` was not found",
+        )
+    element.click()  # click element
+
+
+def wait_until_value_change(driver: webdriver, select_id: str, exp_value: str) -> None:
+    """wait while select does not changed value"""
+    WebDriverWait(driver, TIMEOUT).until(
+        WaitUntilChangedSelect((By.XPATH, f"//select[@id='{select_id}']/option[@selected='selected']"), exp_value),
+        f"element `{select_id}` has not changed value `{exp_value}`",
     )
-    logger.debug(f"element {select_id} was found")
-    return element
+
+
+def wait_until_empty_select(driver: webdriver, select_id: str) -> None:
+    """waith while select is empty"""
+    WebDriverWait(driver, TIMEOUT).until(
+        WaitUntilEmptySelect((By.XPATH, f"//select[@id='{select_id}']")),
+        f"element `{select_id}` is empty",
+    )
