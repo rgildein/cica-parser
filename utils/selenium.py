@@ -31,7 +31,7 @@ class WaitUntilNotEmptySelect(object):
 
 
 @tries
-def wait_until_not_empty(driver: webdriver.Firefox, select_id: str) -> None:
+def wait_until_empty(driver: webdriver, select_id: str) -> None:
     """wait until select is not empty"""
 
     WebDriverWait(driver, TIMEOUT).until(
@@ -42,9 +42,9 @@ def wait_until_not_empty(driver: webdriver.Firefox, select_id: str) -> None:
 
 
 @tries
-def wait_until_click(driver: webdriver.Firefox, select_id: str, value: str) -> None:
+def wait_until_click(driver: webdriver, select_id: str, value: str) -> None:
     """wait util select value"""
-    wait_until_not_empty(driver, select_id)
+    wait_until_empty(driver, select_id)
     WebDriverWait(driver, TIMEOUT).until(
         expected_conditions.element_to_be_clickable(
             (By.XPATH, f"//select[@id='{select_id}']/option[@value='{value}']")
@@ -55,9 +55,9 @@ def wait_until_click(driver: webdriver.Firefox, select_id: str, value: str) -> N
 
 
 @tries
-def wait_until_find(driver: webdriver.Firefox, select_id: str) -> webelement:
+def wait_until_find(driver: webdriver, select_id: str) -> webelement:
     """wait until find select"""
-    wait_until_not_empty(driver, select_id)
+    wait_until_empty(driver, select_id)
     element = WebDriverWait(driver, TIMEOUT).until(
         expected_conditions.element_to_be_clickable((By.XPATH, f"//select[@id='{select_id}']")),
         f"element {select_id} was not found",
