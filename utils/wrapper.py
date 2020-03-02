@@ -14,7 +14,7 @@ def tries(f: Optional[Callable] = None, try_count: int = 3):
             try:
                 return func(*args, **kwargs)
             except Exception as error:
-                logger.error(error)
+                logger.error(f"try {count} with error: {error}")
                 if count + 1 < try_count:
                     return decorator(*args, count=count + 1, **kwargs)
                 else:
