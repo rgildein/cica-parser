@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from utils.data import save_data
 from utils.logger import set_up_logger
-from utils.parser import cica, get_cadastral_areas, get_districts, get_owner_list, get_surnames, get_letters
+from utils.parser import cica, get_cadastral_areas, get_districts, get_letters, get_owner_list, get_surnames
 
 logger = logging.getLogger(__name__)
 

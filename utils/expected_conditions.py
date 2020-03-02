@@ -26,7 +26,7 @@ class WaitUntilEmptySelect(WaitUntilReadySelect):
         try:
             element = super().__call__(driver)
             options = Select(element).options
-            return not(options[0].text == "" and len(options) == 1)
+            return not (options[0].text == "" and len(options) == 1)
         except (WebDriverException, IndexError):
             return False
 

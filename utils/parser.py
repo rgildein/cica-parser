@@ -5,9 +5,13 @@ from typing import Any, Callable, Dict, List, Optional
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
-from utils.selenium import get_selected_value, select_value, wait_until_value_change, get_select_options, \
-    wait_until_empty_select
-
+from utils.selenium import (
+    get_select_options,
+    get_selected_value,
+    select_value,
+    wait_until_empty_select,
+    wait_until_value_change,
+)
 
 STEPS_ORDER = ["district", "cadastral_area", "letter", "surname"]
 TIMEOUT = 5
@@ -113,9 +117,7 @@ def get_letters(driver: webdriver, district: str, cadastral_area: str, **kwargs)
         options = get_select_options(driver, "DropDownList_ABC")
         return [letter.value for letter in options]
 
-    return cica_execute(
-        parse, driver, steps={"district": district, "cadastral_area": cadastral_area}, **kwargs,
-    )
+    return cica_execute(parse, driver, steps={"district": district, "cadastral_area": cadastral_area}, **kwargs,)
 
 
 def get_surnames(driver: webdriver, district: str, cadastral_area: str, letter: str, **kwargs) -> List[str]:
@@ -123,9 +125,7 @@ def get_surnames(driver: webdriver, district: str, cadastral_area: str, letter: 
 
     def parse():
         options = get_select_options(driver, "DropDownList_VL_PRI")
-        return [
-            surname.value for surname in options if not surname.text.startswith("Nie je vlastník začínajúci na")
-        ]
+        return [surname.value for surname in options if not surname.text.startswith("Nie je vlastník začínajúci na")]
 
     return cica_execute(
         parse, driver, steps={"district": district, "cadastral_area": cadastral_area, "letter": letter}, **kwargs,
