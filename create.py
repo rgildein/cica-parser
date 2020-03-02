@@ -8,6 +8,7 @@ from selenium import webdriver
 from tqdm import tqdm
 
 from utils.data import save_data
+from utils.helpers import progress_bar_alive
 from utils.logger import set_up_logger
 from utils.parser import cica, get_cadastral_areas, get_districts, get_letters, get_owner_list, get_surnames
 
@@ -31,7 +32,7 @@ def get_data(args: Tuple[int, int, bool, bool]):
     set_up_logger(debug, console, f"{output}.log")
 
     with cica() as driver:
-        pbar = tqdm(get_districts(driver, max_try=5)[::-1][part::n], desc=f"district #{part}", position=part)
+        pbar = tqdm(get_districts(driver, max_try=5)[::-1][part::n], desc=f"district #{part+1}", position=part)
         for district in pbar:
             logger.info(f"district: `{district}`")
 
@@ -43,12 +44,16 @@ def get_data(args: Tuple[int, int, bool, bool]):
                 for i1, letter in enumerate(letters):
                     logger.info(f"letter: `{letter}`")
 
-                    for surname in get_surnames(driver, district, cadastral_area, letter, max_try=5):
+                    for alive, surname in zip(
+                            progress_bar_alive(), get_surnames(driver, district, cadastral_area, letter, max_try=5)
+                    ):
                         logger.info(f"surname: `{surname}`")
                         get_owners(f"{output}.csv", driver, district, cadastral_area, letter, surname)
 
-                    pbar.set_description(f"district #{part} {i0+1}/{len(cadastral_areas)} {i1+1}/{len(letters)}")
-                    pbar.refresh()
+                        pbar.set_description(
+                            f"district #{part+1} {i0+1}/{len(cadastral_areas)} {i1+1}/{len(letters)} {alive}"
+                        )
+                        pbar.refresh()
 
 
 def main(debug: bool, console: bool, number_of_thread: int):
