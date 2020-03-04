@@ -32,7 +32,7 @@ def get_data(args: Tuple[int, int, bool, bool]):
     set_up_logger(debug, console, f"{output}.log")
 
     with cica() as driver:
-        pbar = tqdm(get_districts(driver, max_try=5)[::-1][part::n], desc=f"district #{part+1}", position=part)
+        pbar = tqdm(get_districts(driver, max_try=5)[part::n], desc=f"district #{part+1}", position=part)
         for district in pbar:
             logger.info(f"district: `{district}`")
 

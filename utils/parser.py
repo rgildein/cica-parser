@@ -1,12 +1,13 @@
 import logging
+import time
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, List, Optional
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
-from utils.selenium import get_select_options, get_selected_value, select_value, get_select_element_id, \
-    wait_until_new_select
+from utils.selenium import get_select_options, get_selected_value, select_value, wait_until_value_change
+
 
 STEPS_ORDER = ["district", "cadastral_area", "letter", "surname"]
 TIMEOUT = 5
@@ -46,28 +47,32 @@ def cica_steps(
         cica_initialized(driver)
 
     if district and district != get_selected_value(driver, "DropDownList_okres"):
-        original_cadastral_area_id = get_select_element_id(driver, "DropDownList_ku")
+        test_cadastral_area = get_selected_value(driver, "DropDownList_ku")
         select_value(driver, "DropDownList_okres", district)
-        wait_until_new_select(driver, "DropDownList_ku", original_cadastral_area_id)
+        wait_until_value_change(driver, "DropDownList_ku", test_cadastral_area)
         logger.info(f"district `{district}` was successfully changed")
+        time.sleep(.5)
 
     if cadastral_area and cadastral_area != get_selected_value(driver, "DropDownList_ku"):
-        original_commune_id = get_select_element_id(driver, "DropDownList_obec")
+        test_commune = get_selected_value(driver, "DropDownList_obec")
         select_value(driver, "DropDownList_ku", cadastral_area)
-        wait_until_new_select(driver, "DropDownList_obec", original_commune_id)
+        wait_until_value_change(driver, "DropDownList_obec", test_commune)
         logger.info(f"cadastral_area `{cadastral_area}` was successfully changed")
+        time.sleep(.5)
 
     if letter and letter != get_selected_value(driver, "DropDownList_ABC"):
-        original_surname_id = get_select_element_id(driver, "DropDownList_VL_PRI")
+        test_surname = get_selected_value(driver, "DropDownList_VL_PRI")
         select_value(driver, "DropDownList_ABC", letter)
-        wait_until_new_select(driver, "DropDownList_VL_PRI", original_surname_id)
+        wait_until_value_change(driver, "DropDownList_VL_PRI", test_surname)
         logger.info(f"letter `{letter}` was successfully changed")
+        time.sleep(.5)
 
     if surname and surname != get_selected_value(driver, "DropDownList_VL_PRI"):
-        original_owner_id = get_select_element_id(driver, "DropDownList_VL")
+        test_owner = get_selected_value(driver, "DropDownList_VL")
         select_value(driver, "DropDownList_VL_PRI", surname)
-        wait_until_new_select(driver, "DropDownList_VL", original_owner_id)
+        wait_until_value_change(driver, "DropDownList_VL", test_owner)
         logger.info(f"surname `{surname}` was successfully changed")
+        time.sleep(.5)
 
 
 def cica_execute(

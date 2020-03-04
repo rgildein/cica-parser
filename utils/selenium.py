@@ -2,6 +2,7 @@ import logging
 from typing import List, NamedTuple
 
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -13,7 +14,7 @@ from utils.expected_conditions import (
     WaitUntilValueSelect,
     WaitUntilIdSelect, WaitUntilNewSelect)
 
-TIMEOUT = 20
+TIMEOUT = 5
 Option = NamedTuple("option", [("text", str), ("value", str)])
 logger = logging.getLogger(__name__)
 
@@ -35,11 +36,15 @@ def get_select_options(driver: webdriver, select_id: str) -> List[Option]:
 
 def get_selected_value(driver: webdriver, select_id: str) -> str:
     """get actual selected value"""
-    value = WebDriverWait(driver, TIMEOUT).until(
-        WaitUntilValueSelect((By.XPATH, f"//select[@id='{select_id}']/option[@selected='selected']")),
-        f"element '{select_id}' has no selected value",
-    )
-    return value if value != "--empty--" else ""
+    try:
+        value = WebDriverWait(driver, TIMEOUT).until(
+            WaitUntilValueSelect((By.XPATH, f"//select[@id='{select_id}']/option[@selected='selected']")),
+            f"element '{select_id}' has no selected value",
+        )
+        return value if value != "--empty--" else ""
+    except TimeoutException:
+        logger.warning(f"element '{select_id}' has no selected value")
+        return ""
 
 
 def select_value(driver: webdriver, select_id: str, value: str) -> None:
@@ -53,10 +58,13 @@ def select_value(driver: webdriver, select_id: str, value: str) -> None:
 
 def wait_until_value_change(driver: webdriver, select_id: str, exp_value: str) -> None:
     """wait while select does not changed value"""
-    WebDriverWait(driver, TIMEOUT).until(
-        WaitUntilChangedSelect((By.XPATH, f"//select[@id='{select_id}']/option[@selected='selected']"), exp_value),
-        f"element `{select_id}` has not changed value `{exp_value}`",
-    )
+    try:
+        WebDriverWait(driver, TIMEOUT).until(
+            WaitUntilChangedSelect((By.XPATH, f"//select[@id='{select_id}']/option[@selected='selected']"), exp_value),
+            f"element `{select_id}` has not changed value `{exp_value}`",
+        )
+    except TimeoutException:
+        logger.warning(f"element `{select_id}` has not changed value `{exp_value}`")
 
 
 def wait_until_empty_select(driver: webdriver, select_id: str) -> None:

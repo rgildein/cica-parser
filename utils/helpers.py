@@ -3,4 +3,4 @@ def progress_bar_alive():
     options, i = ["|", "/", "─", "\\"], 0
     while True:
         yield options[i]
-        i = (i+1)%4
+        i = (i + 1) % 4
