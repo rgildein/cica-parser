@@ -1,3 +1,5 @@
+from typing import List
+
 SLOVAK_ALPHABET = {
     "á": "a",
     "ä": "a",
@@ -27,3 +29,9 @@ def remove_slovak_alphabet(text: str) -> str:
         text = text.replace(slovak_letter.upper(), letter.upper())
 
     return text
+
+
+def verify_name(name: str, validated_names: List[str]) -> bool:
+    """verify that the name is listed in the names list"""
+    clean_name = remove_slovak_alphabet(name.lower())
+    return any([clean_name.find(remove_slovak_alphabet(vs.lower())) >= 0 for vs in validated_names])
