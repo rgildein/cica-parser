@@ -9,10 +9,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 from utils.expected_conditions import (
     WaitUntilChangedSelect,
     WaitUntilEmptySelect,
+    WaitUntilIdSelect,
+    WaitUntilNewSelect,
     WaitUntilReadySelect,
     WaitUntilSelectOptions,
     WaitUntilValueSelect,
-    WaitUntilIdSelect, WaitUntilNewSelect)
+)
 
 TIMEOUT = 5
 Option = NamedTuple("option", [("text", str), ("value", str)])

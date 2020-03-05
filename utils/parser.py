@@ -1,5 +1,4 @@
 import logging
-import time
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, List, Optional
 
@@ -8,16 +7,16 @@ from selenium.webdriver.firefox.options import Options
 
 from utils.selenium import get_select_options, get_selected_value, select_value, wait_until_value_change
 
-
 STEPS_ORDER = ["district", "cadastral_area", "letter", "surname"]
-TIMEOUT = 5
+TIMEOUT = 2
 logger = logging.getLogger(__name__)
 
 
 @contextmanager
-def cica():
+def cica(headless: bool = True):
     options = Options()
-    options.add_argument("--headless")
+    if headless:
+        options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
     try:
         cica_initialized(driver)
@@ -28,6 +27,7 @@ def cica():
 
 def cica_initialized(driver: webdriver):
     """initialized cica page"""
+    driver.delete_all_cookies()
     driver.get("https://cica.vugk.sk/Default.aspx")
     driver.find_element_by_id("button_VL").click()
     logger.info("cica page was initialized")
@@ -51,28 +51,24 @@ def cica_steps(
         select_value(driver, "DropDownList_okres", district)
         wait_until_value_change(driver, "DropDownList_ku", test_cadastral_area)
         logger.info(f"district `{district}` was successfully changed")
-        time.sleep(.5)
 
     if cadastral_area and cadastral_area != get_selected_value(driver, "DropDownList_ku"):
         test_commune = get_selected_value(driver, "DropDownList_obec")
         select_value(driver, "DropDownList_ku", cadastral_area)
         wait_until_value_change(driver, "DropDownList_obec", test_commune)
         logger.info(f"cadastral_area `{cadastral_area}` was successfully changed")
-        time.sleep(.5)
 
     if letter and letter != get_selected_value(driver, "DropDownList_ABC"):
         test_surname = get_selected_value(driver, "DropDownList_VL_PRI")
         select_value(driver, "DropDownList_ABC", letter)
         wait_until_value_change(driver, "DropDownList_VL_PRI", test_surname)
         logger.info(f"letter `{letter}` was successfully changed")
-        time.sleep(.5)
 
     if surname and surname != get_selected_value(driver, "DropDownList_VL_PRI"):
         test_owner = get_selected_value(driver, "DropDownList_VL")
         select_value(driver, "DropDownList_VL_PRI", surname)
         wait_until_value_change(driver, "DropDownList_VL", test_owner)
         logger.info(f"surname `{surname}` was successfully changed")
-        time.sleep(.5)
 
 
 def cica_execute(
