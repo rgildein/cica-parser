@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import click
 from selenium import webdriver
@@ -53,14 +53,11 @@ def download(
             for area in tqdm(areas or get_cadastral_areas(driver, district), desc="area", leave=False, position=1):
                 logger.info(f"area {area}")
                 for letter in tqdm(
-                        letters or get_letters(driver, district, area), desc="letter", leave=False, position=2,
+                    letters or get_letters(driver, district, area), desc="letter", leave=False, position=2,
                 ):
                     logger.info(f"letter {letter}")
                     for surname in tqdm(
-                            get_surnames(driver, district, area, letter),
-                            desc="surname",
-                            leave=False,
-                            position=3,
+                        get_surnames(driver, district, area, letter), desc="surname", leave=False, position=3,
                     ):
                         if verify_name(surname, surnames):
                             logger.info(f"surname {surname}")
