@@ -3,7 +3,7 @@ from datetime import datetime
 
 import click
 
-from utils.data import load_data, join_tables
+from utils.data import join_tables, load_data
 
 
 @click.command()

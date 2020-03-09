@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from utils.data import save_data, load_data, join_tables
+from utils.data import join_tables, load_data, save_data
 
 
 def test_save_data(tmpdir):
