@@ -1,0 +1,60 @@
+version: '2.1'
+
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.6.1
+default-python: &default-python
+  docker:
+    - image: circleci/python:3.8
+
+aliases:
+  - &restore_cache
+    restore_cache:
+      keys:
+        - v1-python-{{ checksum "Pipfile" }}-{{ checksum "Pipfile.lock" }}
+        - v1-python-{{ checksum "Pipfile" }}
+  - &pipenv_install_dev
+    run:
+      name: Install Dependencies with dev
+      command: pipenv install --ignore-pipfile --dev
+  - &save_cache
+    save_cache:
+      key: v1-python-{{ checksum "Pipfile" }}-{{ checksum "Pipfile.lock" }}
+      paths:
+        - ~/.local/share/virtualenvs
+        - ~/.cache/pip
+  - &isort
+    run:
+      name: isort
+      command: pipenv run isort -rc --check
+  - &black
+    run:
+      name: black
+      command: pipenv run black .
+  - &pytest
+    run:
+      name: pytest
+      command: pipenv run pytest -sv
+  - &test_requirements
+    run:
+      name: check requirements
+      command: pipenv run pip freeze | diff requirements.txt -
+
+jobs:
+  tests:
+    <<: *default-python
+    steps:
+      - checkout
+      - *restore_cache
+      - *pipenv_install_dev
+      - *save_cache
+      - *black
+      - *isort
+      - *test_requirements
+      - *pytest
+
+
+workflows:
+  version: 2
+  run_all:
+    jobs:
+      - tests
